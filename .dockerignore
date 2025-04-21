@@ -1,0 +1,25 @@
+# .dockerignore (at project root)
+
+# Git files
+.git
+.gitignore
+
+# Environment files
+.env*
+*.env
+
+# Docker files (if needed, e.g., if you have multiple compose files)
+# docker-compose*.yml
+
+# Compiled binary if built locally
+api-server
+*.exe
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# OS-specific files
+*~
+*.swp
+*.DS_Store
