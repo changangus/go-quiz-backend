@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   # API
   api:
@@ -11,7 +10,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=postgres_quiz_db
       - DB_PORT=${DB_PORT:-5432}
       - DB_USER=${DB_USER:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-password}
@@ -43,6 +42,51 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
+      
+  # Migration service to run database migrations
+  db_migrate:
+    image: go-quiz-backend
+    container_name: go-quiz-migrate
+    environment:
+      - DB_HOST=postgres_quiz_db
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - DB_NAME=quizdb
+    volumes:
+      - .:/app
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - app-network
+    command: go run ./db/migrations/migrations.go
+    profiles:
+      - migrate
+      
+  # Seeder service for database seeding
+  db_seed:
+    image: go-quiz-backend
+    container_name: go-quiz-seeder
+    environment:
+      - DB_HOST=postgres_quiz_db
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - DB_NAME=quizdb
+    volumes:
+      - .:/app
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - app-network
+    # This service will exit after running the seeder
+    command: go run ./db/seeds/seeder.go
+    profiles:
+      - seed
 
 networks:
   app-network:

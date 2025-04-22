@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS quizzes (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS questions (
+  id SERIAL PRIMARY KEY,
+  quiz_id INT NOT NULL,
+  question TEXT NOT NULL,
+  type VARCHAR(20) NOT NULL,
+  order_num INT NOT NULL,
+  FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS answers (
+  id SERIAL PRIMARY KEY,
+  question_id INT NOT NULL,
+  answer TEXT NOT NULL,
+  is_correct BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+);
