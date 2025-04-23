@@ -7,11 +7,25 @@ import (
 	"os"
 
 	"github.com/changangus/go-quiz-backend/internal/models"
+	"github.com/changangus/go-quiz-backend/internal/repository"
 
 	_ "github.com/lib/pq"
 )
 
-type Quiz = models.Quiz
+type (
+	Quiz     = models.Quiz
+	Question = models.Question
+	Answer   = models.Answer
+)
+
+var (
+	// CreateQuiz creates a new quiz in the database
+	createQuiz = repository.CreateQuiz
+	// CreateQuestion creates a new question in the database
+	createQuestion = repository.CreateQuestion
+	// CreateAnswer creates a new answer in the database
+	createAnswer = repository.CreateAnswer
+)
 
 // Helper function to get environment variable with a default value
 func getEnv(key, defaultValue string) string {
@@ -37,12 +51,6 @@ func alertUserIfTablesDontExist(db *sql.DB) error {
 
 	return nil
 }
-
-// Question represents a question entity
-type Question = models.Question
-
-// Answer represents an answer entity
-type Answer = models.Answer
 
 func main() {
 	// Get environment variables or use defaults
@@ -90,40 +98,6 @@ func main() {
 	seedQuestions(db, quizID)
 
 	fmt.Println("Database seeded successfully!")
-}
-
-func createQuiz(db *sql.DB, quiz *Quiz) (int64, error) {
-	var quizID int64
-	err := db.QueryRow(
-		"INSERT INTO quizzes (title, description) VALUES ($1, $2) RETURNING id",
-		quiz.Title, quiz.Description,
-	).Scan(&quizID)
-	if err != nil {
-		return 0, err
-	}
-
-	return quizID, nil
-}
-
-func createQuestion(db *sql.DB, question *Question) (int64, error) {
-	var questionID int64
-	err := db.QueryRow(
-		"INSERT INTO questions (quiz_id, question, type, order_num) VALUES ($1, $2, $3, $4) RETURNING id",
-		question.QuizID, question.Question, question.Type, question.Order,
-	).Scan(&questionID)
-	if err != nil {
-		return 0, err
-	}
-
-	return questionID, nil
-}
-
-func createAnswer(db *sql.DB, answer *Answer) error {
-	_, err := db.Exec(
-		"INSERT INTO answers (question_id, answer, is_correct) VALUES ($1, $2, $3)",
-		answer.QuestionID, answer.Answer, answer.Correct,
-	)
-	return err
 }
 
 func seedQuestions(db *sql.DB, quizID int64) {
