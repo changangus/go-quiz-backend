@@ -20,8 +20,8 @@ func main() {
 		server.WithRecovery(),
 	)
 
-	quizTool := mcp.NewTool("JSON Quiz Generator",
-		mcp.WithDescription("Generate a quiz based on user input"),
+	quizTool := mcp.NewTool("FormatQuizForApi",
+		mcp.WithDescription("Takes a complete quiz, created by Claude Desktop, and formats it for the API."),
 		mcp.WithString("quiz_json_payload",
 			mcp.Required(),
 			mcp.Description(`A JSON string representing the full quiz content. The JSON object MUST conform to the following structure:
